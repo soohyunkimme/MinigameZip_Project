@@ -6,10 +6,8 @@ public class CameraController : MonoBehaviour
 {
     //Move
     public float moveSpeed = 1f;
-    [SerializeField]
-    private Vector2 inputPostion;
-    [SerializeField]
-    private Vector2 outputPostion;
+    private Vector3 lastFrameMousePos;
+
 
     //Zoom
     //public float zoomSpeed = 1f;
@@ -18,12 +16,29 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        MoveCamera();
+        if (GameManager.instance.isActive == true)
+        {
+            RotateTargetObject();
+            MoveCamera();
+            lastFrameMousePos = Input.mousePosition;
+        }
+    }
+
+    private void RotateTargetObject()
+    {
+        if (Input.GetMouseButton(0) && lastFrameMousePos != null)
+        {
+            Vector3 rotateVector = Input.mousePosition - lastFrameMousePos;
+            GameManager.instance.targetObject.transform.Rotate(rotateVector); //자연스러운 돌리기로 고치기
+        }
     }
 
     private void MoveCamera()
     {
-        if (Input.GetMouseButtonDown(1)) inputPostion = Input.mousePosition;
-        if (Input.GetMouseButtonUp(1)) outputPostion = Input.mousePosition;
+        if (Input.GetMouseButton(1) && lastFrameMousePos != null)
+        {
+            Vector3 moveVector = Input.mousePosition - lastFrameMousePos;
+            Camera.main.transform.position += - moveVector * Time.deltaTime * moveSpeed;
+        }
     }
 }
